@@ -1,0 +1,605 @@
+--------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/robertackerman/Desktop/School/Labor Econ I/HW/Homework # 1/HW1_Ackerman.log
+  log type:  text
+ opened on:  17 Jul 2014, 17:16:17
+
+. 
+. use PSID2003.dta, clear
+
+. keep ER21002 ER21017 ER21018 ER21023 ER21123 ER21928 ER21929 ER21020 ER23450 ER23434 ER23446 ER23454 ER24179
+
+. gen  indid2003=ER21002*100+1
+
+. sort indid2003
+
+. save psid2003w.dta, replace
+(note: file psid2003w.dta not found)
+file psid2003w.dta saved
+
+. 
+. use PSID2005.dta, clear
+
+. keep ER25002 ER25017 ER25018 ER25020 ER25023 ER25104 ER25909 ER25910 ER27401 ER27413 ER27417 ER27421 ER28078 ER27704
+
+. gen indid2005=ER25002*100+1
+
+. sort indid2005
+
+. save psid2005w.dta, replace
+(note: file psid2005w.dta not found)
+file psid2005w.dta saved
+
+. 
+. use hhlink_ex.dta
+
+. keep indid2003 indid2005
+
+. sort indid2003
+
+. save psidlink.dta, replace
+file psidlink.dta saved
+
+. 
+. use psid2003w.dta, clear
+
+. merge 1:1 indid2003 using psidlink.dta
+(note: variable indid2003 was float, now double to accommodate using data's values)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                             0
+    matched                             7,822  (_merge==3)
+    -----------------------------------------
+
+. sort indid2003
+
+. save psidmerged.dta, replace
+file psidmerged.dta saved
+
+. 
+. use hhlink_ex.dta, clear
+
+. keep indid2003 indid2005
+
+. drop if indid2005==0
+(556 observations deleted)
+
+. sort indid2005
+
+. save psidlink2.dta, replace
+file psidlink2.dta saved
+
+. 
+. use psid2005w.dta, clear
+
+. joinby indid2005 using psidlink2.dta
+
+. save psid2005w.dta, replace
+file psid2005w.dta saved
+
+. 
+. use psidmerged.dta, clear
+
+. merge 1:1 indid2005 indid2003 using psid2005w.dta, gen(_merge3)
+(note: variable indid2005 was long, now double to accommodate using data's values)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                         1,025
+        from master                     1,025  (_merge3==1)
+        from using                          0  (_merge3==2)
+
+    matched                             6,797  (_merge3==3)
+    -----------------------------------------
+
+. save psidmergedfinal.dta, replace
+file psidmergedfinal.dta saved
+
+. 
+. count if indid2005==0
+  556
+
+. 
+. rename ER21017 age2003
+
+. rename ER21018 female2003
+
+. rename ER21023 married2003
+
+. rename ER21123 wrknow2003
+
+. rename ER21928 wagdum2003
+
+. rename ER21929 wagamt2003
+
+. rename ER21020 numkid2003
+
+. rename ER24179 weight2003
+
+. 
+. rename ER25017 age2005
+
+. rename ER25018 female2005
+
+. rename ER25020 numkid2005
+
+. rename ER25023 married2005
+
+. rename ER25104 wrknow2005
+
+. rename ER25909 wagdum2005
+
+. rename ER25910 wagamt2005
+
+. rename ER28078 weight2005
+
+. rename ER27704 train2005
+
+. 
+. mvdecode age2003, mv(999=.) 
+     age2003: 1 missing value generated
+
+. mvdecode married2003, mv(9=.)
+ married2003: 1 missing value generated
+
+. mvdecode wagdum2003, mv(8,9=.) 
+  wagdum2003: 7 missing values generated
+
+. mvdecode wagamt2003, mv(9999998,9999999=.)
+  wagamt2003: 506 missing values generated
+
+. mvdecode wrknow2003, mv(2,4,5,6,7,8,99,0,22=.)
+  wrknow2003: 1610 missing values generated
+
+. mvdecode wagdum2005, mv(8,9,2,4=.)
+  wagdum2005: 6 missing values generated
+
+. mvdecode wagamt2005, mv(9999998,9999999=.) 
+  wagamt2005: 381 missing values generated
+
+. mvdecode wrknow2005, mv(2,4,5,6,7,8,99,0=.)
+  wrknow2005: 1489 missing values generated
+
+. mvdecode train2005, mv(0,9=.)
+   train2005: 139 missing values generated
+
+. 
+. replace female2003=0 if female2003==1
+(5483 real changes made)
+
+. replace female2003=1 if female2003==2
+(2339 real changes made)
+
+. replace female2005=0 if female2005==1
+(4877 real changes made)
+
+. replace female2005=1 if female2005==2
+(1920 real changes made)
+
+. 
+. replace married2003=0 if married2003==2
+(1689 real changes made)
+
+. replace married2003=0 if married2003==3
+(565 real changes made)
+
+. replace married2003=0 if married2003==4
+(1239 real changes made)
+
+. replace married2003=0 if married2003==5
+(368 real changes made)
+
+. replace married2005=0 if married2005==2
+(1323 real changes made)
+
+. replace married2005=0 if married2005==3
+(499 real changes made)
+
+. replace married2005=0 if married2005==4
+(1048 real changes made)
+
+. replace married2005=0 if married2005==5
+(242 real changes made)
+
+. 
+. replace numkid2003=1 if numkid2003==1 |numkid2003==2
+(1324 real changes made)
+
+. replace numkid2003=2 if numkid2003>=3
+(758 real changes made)
+
+. replace numkid2005=1 if numkid2005==1 |numkid2005==2
+(1137 real changes made)
+
+. replace numkid2005=2 if numkid2005>=3
+(1690 real changes made)
+
+. replace numkid2005=. if _merge3==1
+(1025 real changes made, 1025 to missing)
+
+. 
+. replace wagdum2003=0 if wagdum2003==5
+(1771 real changes made)
+
+. replace wagdum2005=0 if wagdum2005==5
+(1515 real changes made)
+
+. 
+. replace train2005=0 if train2005==5
+(6576 real changes made)
+
+. 
+. replace wrknow2003=0 if wrknow2003==3
+(472 real changes made)
+
+. replace wrknow2005=0 if wrknow2005==3
+(306 real changes made)
+
+. 
+. sum indid2003 indid2005 age2003 numkid2003 married2003 wagdum2003 wagamt2003 weight2003 female2003 wrknow2003 age2005 nu
+> mkid2005 married2005 wagdum2005 wagamt2005 weight2005 female2005 wrknow2005
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+   indid2003 |      7822    392472.1    226861.2        101     787001
+   indid2005 |      7822    349316.5    237206.3          0     804171
+     age2003 |      7821    44.97826    15.97441         16         98
+  numkid2003 |      7822    .5501151    .6643472          0          2
+ married2003 |      7821    .5063291    .4999919          0          1
+-------------+--------------------------------------------------------
+  wagdum2003 |      7815    .7733845    .4186685          0          1
+  wagamt2003 |      7316    30794.33     63845.5          0    3500000
+  weight2003 |      7822    15.42355     13.5996          0     82.804
+  female2003 |      7822    .2990284    .4578616          0          1
+  wrknow2003 |      6212     .924018    .2649906          0          1
+-------------+--------------------------------------------------------
+     age2005 |      6797    47.19891    15.84043         17         99
+  numkid2005 |      6797    .5436222    .6662109          0          2
+ married2005 |      6797    .5421509    .4982568          0          1
+  wagdum2005 |      6791    .7769106    .4163485          0          1
+  wagamt2005 |      6416    34905.42    67067.08          0    2710000
+-------------+--------------------------------------------------------
+  weight2005 |      6797    22.18839    17.05561        .14    132.641
+  female2005 |      6797    .2824776    .4502375          0          1
+  wrknow2005 |      5308    .9423512    .2331002          0          1
+
+. 
+. gen college2003=.
+(7822 missing values generated)
+
+. 
+. replace college2003=1  if ER23450== 1
+(1942 real changes made)
+
+. replace college2003=0  if ER23450==5
+(1531 real changes made)
+
+. replace college2003=1  if ER23450==0 & ER23454>=16 & ER23454<99 & ER23434==2
+(61 real changes made)
+
+. replace college2003=0  if ER23450==0 & ER23434==2 & ER23454<16
+(271 real changes made)
+
+. replace college2003=0  if ER23450==0 & ER23446==5
+(3432 real changes made)
+
+. replace college2003=0  if ER23434==5
+(20 real changes made)
+
+. 
+. gen college2005=.
+(7822 missing values generated)
+
+. 
+. replace college2005=1  if ER27417== 1
+(1740 real changes made)
+
+. replace college2005=0  if ER27417==5
+(1351 real changes made)
+
+. replace college2005=1  if ER27417==0 & ER27421>=16 & ER27421<99 & ER27401==2
+(55 real changes made)
+
+. replace college2005=0  if ER27417==0 & ER27401==2 & ER27421<16
+(237 real changes made)
+
+. replace college2005=0  if ER27417==0 & ER27413==5
+(2908 real changes made)
+
+. replace college2005=0  if ER27401==5
+(19 real changes made)
+
+. 
+. mean age2003 numkid2003 married2003 wagdum2003 wagamt2003 female2003 wrknow2003 college2003 [pweight=weight2003] 
+
+Mean estimation                     Number of obs    =    4320
+
+--------------------------------------------------------------
+             |       Mean   Std. Err.     [95% Conf. Interval]
+-------------+------------------------------------------------
+     age2003 |   43.17936   .2258428      42.73659    43.62213
+  numkid2003 |   .4819296   .0110628      .4602408    .5036184
+ married2003 |   .5290885   .0092077      .5110366    .5471403
+  wagdum2003 |   .9141068   .0052394      .9038349    .9243787
+  wagamt2003 |   43607.55   1350.673      40959.54    46255.57
+  female2003 |   .2522289   .0084372      .2356876    .2687702
+  wrknow2003 |   .9450401   .0041425      .9369187    .9531616
+ college2003 |   .3812228   .0089623       .363652    .3987936
+--------------------------------------------------------------
+
+. mean age2005 numkid2005 married2005 wagdum2005 wagamt2005 female2005 wrknow2005 college2005 [pweight=weight2005]
+
+Mean estimation                     Number of obs    =    4564
+
+--------------------------------------------------------------
+             |       Mean   Std. Err.     [95% Conf. Interval]
+-------------+------------------------------------------------
+     age2005 |    45.3795   .2371851       44.9145     45.8445
+  numkid2005 |   .4712542   .0110476      .4495956    .4929129
+ married2005 |   .5609902   .0094182       .542526    .5794544
+  wagdum2005 |   .9455368   .0042548      .9371954    .9538783
+  wagamt2005 |   49233.53   1430.315      46429.42    52037.64
+  female2005 |     .23821   .0085375      .2214724    .2549475
+  wrknow2005 |    .959805   .0037587      .9524361    .9671739
+ college2005 |   .3797841   .0090263      .3620881    .3974801
+--------------------------------------------------------------
+
+. 
+. reshape long age numkid married wagdum wagamt weight female wrknow college, i(indid2003) j(year)
+(note: j = 2003 2005)
+
+Data                               wide   ->   long
+-----------------------------------------------------------------------------
+Number of obs.                     7822   ->   15644
+Number of variables                  33   ->      25
+j variable (2 values)                     ->   year
+xij variables:
+                        age2003 age2005   ->   age
+                  numkid2003 numkid2005   ->   numkid
+                married2003 married2005   ->   married
+                  wagdum2003 wagdum2005   ->   wagdum
+                  wagamt2003 wagamt2005   ->   wagamt
+                  weight2003 weight2005   ->   weight
+                  female2003 female2005   ->   female
+                  wrknow2003 wrknow2005   ->   wrknow
+                college2003 college2005   ->   college
+-----------------------------------------------------------------------------
+
+. 
+. xtset indid2003 year
+       panel variable:  indid2003 (strongly balanced)
+        time variable:  year, 2003 to 2005, but with gaps
+                delta:  1 unit
+
+. 
+. xttrans wrknow
+
+           |        wrknow
+    wrknow |         0          1 |     Total
+-----------+----------------------+----------
+         0 |     28.70      71.30 |    100.00 
+         1 |      3.60      96.40 |    100.00 
+-----------+----------------------+----------
+     Total |      5.23      94.77 |    100.00 
+
+
+. /* alternatively:
+> gen unemp==ll.wrknow
+> tab wrknow unemp, col*/
+. 
+. probit wrknow age numkid married female college if year==2005 & ll.wrknow==0, robust
+
+Iteration 0:   log pseudolikelihood = -178.37995  
+Iteration 1:   log pseudolikelihood = -165.62408  
+Iteration 2:   log pseudolikelihood = -165.35532  
+Iteration 3:   log pseudolikelihood = -165.35432  
+Iteration 4:   log pseudolikelihood = -165.35432  
+
+Probit regression                                 Number of obs   =        296
+                                                  Wald chi2(5)    =      25.02
+                                                  Prob > chi2     =     0.0001
+Log pseudolikelihood = -165.35432                 Pseudo R2       =     0.0730
+
+------------------------------------------------------------------------------
+             |               Robust
+      wrknow |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         age |  -.0131738    .007908    -1.67   0.096    -.0286732    .0023256
+      numkid |  -.1961215   .1192471    -1.64   0.100    -.4298415    .0375985
+     married |   .5256721   .2305867     2.28   0.023     .0737304    .9776138
+      female |   .0086659   .2004954     0.04   0.966    -.3842979    .4016298
+     college |   1.013097    .298675     3.39   0.001     .4277044    1.598489
+       _cons |   .9557606   .3400571     2.81   0.005     .2892609     1.62226
+------------------------------------------------------------------------------
+
+. margins, dydx(*) atmean
+
+Conditional marginal effects                      Number of obs   =        296
+Model VCE    : Robust
+
+Expression   : Pr(wrknow), predict()
+dy/dx w.r.t. : age numkid married female college
+at           : age             =    37.79054 (mean)
+               numkid          =    .7601351 (mean)
+               married         =    .2939189 (mean)
+               female          =    .4256757 (mean)
+               college         =     .152027 (mean)
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         age |  -.0043338    .002603    -1.66   0.096    -.0094355     .000768
+      numkid |  -.0645181   .0391734    -1.65   0.100    -.1412966    .0122604
+     married |   .1729303   .0757981     2.28   0.023     .0243688    .3214919
+      female |   .0028508   .0659536     0.04   0.966    -.1264158    .1321174
+     college |   .3332783    .095586     3.49   0.000     .1459333    .5206234
+------------------------------------------------------------------------------
+
+. probit wrknow age numkid married female college train2005 if year==2005 & ll.wrknow==0, robust
+
+Iteration 0:   log pseudolikelihood = -176.79924  
+Iteration 1:   log pseudolikelihood = -164.69594  
+Iteration 2:   log pseudolikelihood =  -164.4395  
+Iteration 3:   log pseudolikelihood = -164.43853  
+Iteration 4:   log pseudolikelihood = -164.43853  
+
+Probit regression                                 Number of obs   =        294
+                                                  Wald chi2(6)    =      23.85
+                                                  Prob > chi2     =     0.0006
+Log pseudolikelihood = -164.43853                 Pseudo R2       =     0.0699
+
+------------------------------------------------------------------------------
+             |               Robust
+      wrknow |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         age |  -.0124783   .0079205    -1.58   0.115    -.0280021    .0030455
+      numkid |  -.1778919    .120117    -1.48   0.139    -.4133168     .057533
+     married |   .5056512   .2321579     2.18   0.029       .05063    .9606724
+      female |   .0113226    .200663     0.06   0.955    -.3819696    .4046149
+     college |    1.01569   .2983874     3.40   0.001     .4308614    1.600518
+   train2005 |   .0361391   .4484335     0.08   0.936    -.8427745    .9150527
+       _cons |   .9200299   .3420228     2.69   0.007     .2496775    1.590382
+------------------------------------------------------------------------------
+
+. margins, dydx(*) atmean
+
+Conditional marginal effects                      Number of obs   =        294
+Model VCE    : Robust
+
+Expression   : Pr(wrknow), predict()
+dy/dx w.r.t. : age numkid married female college train2005
+at           : age             =     37.7449 (mean)
+               numkid          =    .7585034 (mean)
+               married         =     .292517 (mean)
+               female          =    .4251701 (mean)
+               college         =    .1530612 (mean)
+               train2005       =    .0340136 (mean)
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         age |  -.0040987   .0026039    -1.57   0.115    -.0092023    .0010049
+      numkid |  -.0584311   .0394074    -1.48   0.138    -.1356682    .0188061
+     married |   .1660881   .0762087     2.18   0.029     .0167219    .3154543
+      female |   .0037191    .065906     0.06   0.955    -.1254544    .1328926
+     college |   .3336173   .0953274     3.50   0.000      .146779    .5204556
+   train2005 |   .0118704   .1472867     0.08   0.936    -.2768063     .300547
+------------------------------------------------------------------------------
+
+. 
+. drop if weight==0
+(1443 observations deleted)
+
+. gen lwag=ln(wagamt)
+(4813 missing values generated)
+
+. gen yrdum=1 if year==2005
+(6379 missing values generated)
+
+. replace yrdum=0 if year==2003
+(6379 real changes made)
+
+. reg lwag female age college yrdum, robust
+
+Linear regression                                      Number of obs =    8694
+                                                       F(  4,  8689) =  296.44
+                                                       Prob > F      =  0.0000
+                                                       R-squared     =  0.1335
+                                                       Root MSE      =  .97896
+
+------------------------------------------------------------------------------
+             |               Robust
+        lwag |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      female |  -.6173774   .0252409   -24.46   0.000    -.6668555   -.5678993
+         age |   .0005004   .0011442     0.44   0.662    -.0017425    .0027432
+     college |   .5563132   .0229327    24.26   0.000     .5113597    .6012666
+       yrdum |   .0360666   .0209741     1.72   0.086    -.0050476    .0771807
+       _cons |    10.2236   .0475531   214.99   0.000     10.13038    10.31681
+------------------------------------------------------------------------------
+
+. reg lwag female age college yrdum [pweight=weight]
+(sum of wgt is   1.7276e+05)
+
+Linear regression                                      Number of obs =    8694
+                                                       F(  4,  8689) =  164.82
+                                                       Prob > F      =  0.0000
+                                                       R-squared     =  0.1199
+                                                       Root MSE      =  1.0028
+
+------------------------------------------------------------------------------
+             |               Robust
+        lwag |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      female |  -.5524242    .033684   -16.40   0.000    -.6184528   -.4863956
+         age |  -.0059926   .0015355    -3.90   0.000    -.0090025   -.0029828
+     college |   .5390394   .0287307    18.76   0.000     .4827205    .5953583
+       yrdum |   .0447174   .0267007     1.67   0.094    -.0076223     .097057
+       _cons |   10.53532   .0648828   162.37   0.000     10.40813     10.6625
+------------------------------------------------------------------------------
+
+. 
+. probit wagdum female age numkid married yrdum
+
+Iteration 0:   log likelihood = -7106.8755  
+Iteration 1:   log likelihood = -5195.5447  
+Iteration 2:   log likelihood = -5171.8729  
+Iteration 3:   log likelihood = -5171.8572  
+Iteration 4:   log likelihood = -5171.8572  
+
+Probit regression                                 Number of obs   =      13165
+                                                  LR chi2(5)      =    3870.04
+                                                  Prob > chi2     =     0.0000
+Log likelihood = -5171.8572                       Pseudo R2       =     0.2723
+
+------------------------------------------------------------------------------
+      wagdum |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      female |     -.0636   .0416227    -1.53   0.127    -.1451791     .017979
+         age |  -.0517275   .0010695   -48.37   0.000    -.0538236   -.0496313
+      numkid |  -.0814128    .024729    -3.29   0.001    -.1298808   -.0329448
+     married |   .3912412   .0391506     9.99   0.000     .3145074     .467975
+       yrdum |   .1132914   .0278735     4.06   0.000     .0586603    .1679225
+       _cons |   3.130077   .0632926    49.45   0.000     3.006025    3.254128
+------------------------------------------------------------------------------
+
+. predict p
+(option pr assumed; Pr(wagdum))
+(1026 missing values generated)
+
+. reg lwag female age college yrdum [pweight=1/p]
+(sum of wgt is   1.0909e+04)
+
+Linear regression                                      Number of obs =    8694
+                                                       F(  4,  8689) =  139.73
+                                                       Prob > F      =  0.0000
+                                                       R-squared     =  0.1413
+                                                       Root MSE      =   1.063
+
+------------------------------------------------------------------------------
+             |               Robust
+        lwag |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      female |  -.6464249   .0405405   -15.95   0.000     -.725894   -.5669558
+         age |  -.0111561   .0025088    -4.45   0.000     -.016074   -.0062382
+     college |   .5754956   .0323648    17.78   0.000     .5120528    .6389384
+       yrdum |   .0577415   .0313446     1.84   0.065    -.0037014    .1191844
+       _cons |   10.68063   .0976757   109.35   0.000     10.48916     10.8721
+------------------------------------------------------------------------------
+
+. 
+. 
+. erase psid2003w.dta
+
+. erase psid2005w.dta
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/robertackerman/Desktop/School/Labor Econ I/HW/Homework # 1/HW1_Ackerman.log
+  log type:  text
+ closed on:  17 Jul 2014, 17:16:28
+--------------------------------------------------------------------------------------------------------------------------
